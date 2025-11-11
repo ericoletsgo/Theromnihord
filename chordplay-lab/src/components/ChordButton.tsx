@@ -16,16 +16,6 @@ export const ChordButton = ({
   onPress,
   onRelease,
 }: ChordButtonProps) => {
-  const [isPressed, setIsPressed] = useState(false);
-
-  useEffect(() => {
-    if (isActive) {
-      setIsPressed(true);
-      const timer = setTimeout(() => setIsPressed(false), 150);
-      return () => clearTimeout(timer);
-    }
-  }, [isActive]);
-
   return (
     <button
       onMouseDown={onPress}
@@ -37,15 +27,15 @@ export const ChordButton = ({
         "transition-all duration-150",
         "hover:scale-[0.98] active:scale-95",
         "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-        isPressed
-          ? "bg-chord-pressed border-primary shadow-lg scale-95"
-          : "bg-chord-idle border-chord-border shadow-md hover:border-primary/50"
+        isActive
+          ? "bg-primary border-primary shadow-lg scale-95"
+          : "bg-card border-border shadow-md hover:border-primary/50"
       )}
     >
       <div className="text-xs font-bold text-muted-foreground mb-1">{keyLabel.toUpperCase()}</div>
       <div className={cn(
         "text-sm font-semibold",
-        isPressed ? "text-primary-foreground" : "text-foreground"
+        isActive ? "text-primary-foreground" : "text-foreground"
       )}>
         {chordName}
       </div>
