@@ -50,7 +50,7 @@ UART_HandleTypeDef huart2;
 GPIO_TypeDef *chordPorts[NUM_CHORD_BTNS] = {
     GPIOA,   // D2  PA10 -> Eb
     GPIOB,   // D3  PB3  -> Bb
-    GPIOB,   // D4  PB  -> F
+    GPIOB,   // D4  PB5  -> F
     GPIOB,   // D5  PB4  -> C
     GPIOB,   // D6  PB10 -> G
     GPIOA,   // D7  PA8  -> D
@@ -123,13 +123,12 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_UART_Transmit(&huart2, (uint8_t*)"OMNICHORD READY\r\n", 17, HAL_MAX_DELAY);
+  char txbuf[64];
   /* USER CODE END 2 */
 
   /* Infinite loop */
-  HAL_UART_Transmit(&huart2, (uint8_t*)"OMNICHORD READY\r\n", 17, HAL_MAX_DELAY);
 
-  char txbuf[64];
 /* USER CODE BEGIN WHILE */
   while (1)
   {
