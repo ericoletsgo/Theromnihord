@@ -21,12 +21,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+#define NUM_CHORD_BTNS 9
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -45,7 +46,35 @@ ADC_HandleTypeDef hadc1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+// Chord Pins
+GPIO_TypeDef *chordPorts[NUM_CHORD_BTNS] = {
+    GPIOA,   // D2  PA10 -> Eb
+    GPIOB,   // D3  PB3  -> Bb
+    GPIOB,   // D4  PB  -> F
+    GPIOB,   // D5  PB4  -> C
+    GPIOB,   // D6  PB10 -> G
+    GPIOA,   // D7  PA8  -> D
+    GPIOA,   // D8  PA9  -> A
+    GPIOC,   // D9  PC7  -> E
+    GPIOB    // D10 PB6  -> B
+};
 
+
+uint16_t chordPins[NUM_CHORD_BTNS] = {
+    GPIO_PIN_10, // PA10
+    GPIO_PIN_3,  // PB3
+    GPIO_PIN_5,  // PB5
+    GPIO_PIN_4,  // PB4
+    GPIO_PIN_10, // PB10
+    GPIO_PIN_8,  // PA8
+    GPIO_PIN_9,  // PA9
+    GPIO_PIN_7,  // PC7
+    GPIO_PIN_6   // PB6
+};
+
+const char *chordNames[NUM_CHORD_BTNS] = {
+    "Eb","Bb","F","C","G","D","A","E","B"
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,13 +127,50 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+  HAL_UART_Transmit(&huart2, (uint8_t*)"OMNICHORD READY\r\n", 17, HAL_MAX_DELAY);
+
+  char txbuf[64];
+/* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
+    HAL_ADC_Start(&hadc1);
+    HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+    uint32_t adcval = HAL_ADC_GetValue(&hadc1);
+    HAL_ADC_Stop(&hadc1);
 
-    /* USER CODE BEGIN 3 */
+    // scale 0..4095 -> 0..127
+    uint8_t thereminVal = (adcval * 127) / 4095;
+    sprintf(txbuf, "THEREMIN %u\r\n", thereminVal);
+    HAL_UART_Transmit(&huart2, (uint8_t*)txbuf, strlen(txbuf), HAL_MAX_DELAY);
+
+    // minor and 7th
+    uint8_t isMinor   = (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1) == GPIO_PIN_RESET);
+    uint8_t isSeventh = (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_7) == GPIO_PIN_RESET);
+
+    // scan buttons
+    for (int i = 0; i < NUM_CHORD_BTNS; i++)
+    {
+        if (HAL_GPIO_ReadPin(chordPorts[i], chordPins[i]) == GPIO_PIN_RESET)
+        {
+            HAL_Delay(10);
+            if (HAL_GPIO_ReadPin(chordPorts[i], chordPins[i]) == GPIO_PIN_RESET)
+            {
+                const char *quality = "MAJ";
+                if (isSeventh) quality = "7TH";
+                else if (isMinor) quality = "MIN";
+
+                sprintf(txbuf, "CHORD %s %s\r\n", chordNames[i], quality);
+                HAL_UART_Transmit(&huart2, (uint8_t*)txbuf, strlen(txbuf), HAL_MAX_DELAY);
+                while (HAL_GPIO_ReadPin(chordPorts[i], chordPins[i]) == GPIO_PIN_RESET)
+                    HAL_Delay(5);
+            }
+        }
+    }
+
+    HAL_Delay(20);
   }
+  /* USER CODE END WHILE */
+  /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
 
@@ -241,15 +307,32 @@ static void MX_USART2_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* --- A pins: PA1 (minor), PA7 (7th), PA8 (D7), PA9 (D8), PA10 (D2) --- */
+  GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;     // <— important
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* --- B pins: PB3 (D3), PB4 (D5), PB5 (D4), PB6 (D10), PB10 (D6) --- */
+  GPIO_InitStruct.Pin = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_10;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;     // <— important
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* --- C pins: PC7 (D9) --- */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;     // <— important
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
+
 
 /* USER CODE BEGIN 4 */
 
@@ -269,8 +352,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
