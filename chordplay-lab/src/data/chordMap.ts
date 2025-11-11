@@ -16,10 +16,15 @@ export interface ChordMapping {
  * - Option 2: Copy the Omnichord folder to public/Omnichord
  * 
  * If using relative paths ../Omnichord/..., they won't work in browser - use /Omnichord/... instead.
+ * 
+ * NOTE: The source material doesn't include eb-chord.wav or g-chord.wav files.
+ * These chords use eb0.wav and g0.wav as fallbacks (the first note in the scale).
+ * This matches the behavior seen in other Omnichord implementations.
+ * Reference: https://github.com/arcticmatt/online-omnichord
  */
 export const chordMap: ChordMapping[] = [
   // Major chords (Q-O): Eb, Bb, F, C, G, D, A, E, B
-  // Note: eb and g don't have -chord.wav files, using eb0.wav and g0.wav as fallbacks
+  // Note: eb and g don't have -chord.wav files in source material, using eb0.wav and g0.wav as fallbacks
   { key: "q", chordName: "Eb MAJ", filePath: "/Omnichord/eb/eb0.wav", row: "major" },
   { key: "w", chordName: "Bb MAJ", filePath: "/Omnichord/bb/bb-chord.wav", row: "major" },
   { key: "e", chordName: "F MAJ", filePath: "/Omnichord/f/f-chord.wav", row: "major" },

@@ -40,8 +40,28 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t border-border mt-16 py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          Built with React + Vite • Omnichord Lab v1.0
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground space-y-2">
+          <div>Built with React + Vite • Omnichord Lab v1.0</div>
+          <div className="text-xs">
+            Inspired by{" "}
+            <a
+              href="https://www.onlineomnichord.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              onlineomnichord.com
+            </a>
+            {" • "}
+            <a
+              href="https://github.com/arcticmatt/online-omnichord"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              GitHub
+            </a>
+          </div>
         </div>
       </footer>
     </div>
