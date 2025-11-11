@@ -38,7 +38,7 @@ const chordToFolder: Record<string, string> = {
 };
 
 export const TouchBar = ({ activeChord }: TouchBarProps) => {
-  const [activeNote, setActiveNote] = useState<number | null>(null);
+  const [activeNotes, setActiveNotes] = useState<Set<number>>(new Set());
   const [chordName, setChordName] = useState<string | null>(null);
 
   // Get chord name from activeChord key
@@ -81,8 +81,17 @@ export const TouchBar = ({ activeChord }: TouchBarProps) => {
       console.error("Failed to play scale note:", filePath, err);
     });
 
-    setActiveNote(noteIndex);
-    setTimeout(() => setActiveNote(null), 200);
+    // Visual feedback - highlight on press
+    setActiveNotes(prev => new Set(prev).add(noteIndex));
+  };
+
+  const stopNote = (noteIndex: number) => {
+    // Remove visual feedback on release
+    setActiveNotes(prev => {
+      const next = new Set(prev);
+      next.delete(noteIndex);
+      return next;
+    });
   };
 
   // Handle keyboard input for scale keys
@@ -106,13 +115,32 @@ export const TouchBar = ({ activeChord }: TouchBarProps) => {
           console.error("Failed to play scale note:", filePath, err);
         });
 
-        setActiveNote(noteIndex);
-        setTimeout(() => setActiveNote(null), 200);
+        // Visual feedback - highlight on key down
+        setActiveNotes(prev => new Set(prev).add(noteIndex));
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const key = e.key;
+      const noteIndex = scaleKeyMap[key];
+      
+      if (noteIndex !== undefined) {
+        e.preventDefault();
+        // Remove visual feedback on key up
+        setActiveNotes(prev => {
+          const next = new Set(prev);
+          next.delete(noteIndex);
+          return next;
+        });
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
   }, [chordName]);
 
   // 12 scale keys (0-11) mapped to 1234567890-=
@@ -138,13 +166,15 @@ export const TouchBar = ({ activeChord }: TouchBarProps) => {
         {scaleKeys.map((index) => (
           <button
             key={index}
-            onClick={() => playNote(index)}
+            onMouseDown={() => playNote(index)}
+            onMouseUp={() => stopNote(index)}
+            onMouseLeave={() => stopNote(index)}
             className={cn(
               "flex-1 h-16 rounded border-2 transition-all duration-150",
               "hover:scale-105 active:scale-95",
               "focus:outline-none focus:ring-2 focus:ring-primary",
               "flex flex-col items-center justify-center",
-              activeNote === index
+              activeNotes.has(index)
                 ? "bg-primary border-primary shadow-lg"
                 : "bg-yellow-200 border-yellow-300 hover:border-primary/50"
             )}
@@ -155,7 +185,7 @@ export const TouchBar = ({ activeChord }: TouchBarProps) => {
         ))}
       </div>
       <p className="text-xs text-center text-muted-foreground">
-        Click scale keys or press 1-9, 0, -, = to play individual notes
+        Click scale keys or press 1-9, 0, -, = to play multiple notes simultaneously
       </p>
     </div>
   );

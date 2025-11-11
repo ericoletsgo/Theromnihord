@@ -65,16 +65,6 @@ export const ChordGrid = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6">
-      {/* Data Display */}
-      <details className="bg-card p-4 rounded-lg border border-border">
-        <summary className="cursor-pointer font-semibold text-foreground mb-2">
-          Chord Mapping Data (click to expand)
-        </summary>
-        <pre className="text-xs overflow-auto bg-muted p-3 rounded">
-          {JSON.stringify(chordMap, null, 2)}
-        </pre>
-      </details>
-
       {isLoading && (
         <div className="text-center text-muted-foreground">Loading audio files...</div>
       )}
