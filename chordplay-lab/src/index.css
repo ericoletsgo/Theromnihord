@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Vintage synth warm palette */
+    --background: 35 40% 94%;
+    --foreground: 25 30% 25%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 25 30% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 30% 25%;
+
+    --primary: 12 85% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 340 65% 82%;
+    --secondary-foreground: 25 30% 25%;
+
+    --muted: 35 25% 88%;
+    --muted-foreground: 25 15% 50%;
+
+    --accent: 48 100% 65%;
+    --accent-foreground: 25 30% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 35 20% 85%;
+    --input: 35 20% 85%;
+    --ring: 12 85% 60%;
+
+    --radius: 0.375rem;
+
+    /* Chord button states */
+    --chord-idle: 0 0% 98%;
+    --chord-active: 12 85% 60%;
+    --chord-pressed: 12 90% 50%;
+    --chord-border: 25 15% 70%;
+
+    /* Transitions */
+    --transition-press: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 25 25% 15%;
+    --foreground: 35 20% 90%;
+
+    --card: 25 20% 18%;
+    --card-foreground: 35 20% 90%;
+
+    --popover: 25 20% 18%;
+    --popover-foreground: 35 20% 90%;
+
+    --primary: 12 85% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 340 40% 35%;
+    --secondary-foreground: 35 20% 90%;
+
+    --muted: 25 15% 25%;
+    --muted-foreground: 35 15% 60%;
+
+    --accent: 48 100% 65%;
+    --accent-foreground: 25 30% 15%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 25 15% 30%;
+    --input: 25 15% 30%;
+    --ring: 12 85% 60%;
+
+    --chord-idle: 25 15% 22%;
+    --chord-active: 12 85% 60%;
+    --chord-pressed: 12 90% 50%;
+    --chord-border: 25 15% 35%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
