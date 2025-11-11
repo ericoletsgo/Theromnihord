@@ -1,0 +1,26 @@
+# STM32CubeIDE / build files
+/Debug/
+/Release/
+/.build/
+/.settings/
+/.metadata/
+/.vscode/
+/.idea/
+/RemoteSystemsTempFiles/
+
+# Build artifacts
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.log
+
+# Misc / editor backups
+*.swp
+*.bak
+*.tmp
+*.user
+*.launch
