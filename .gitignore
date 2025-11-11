@@ -1,4 +1,4 @@
-# STM32CubeIDE / build files
+# STM32CubeIDE / Build Files
 /Debug/
 /Release/
 /.build/
@@ -7,8 +7,11 @@
 /.vscode/
 /.idea/
 /RemoteSystemsTempFiles/
+/Core/Inc/subdir.mk
+/Core/Src/subdir.mk
+/Drivers/subdir.mk
 
-# Build artifacts
+# Build Artifacts
 *.o
 *.d
 *.elf
@@ -17,10 +20,24 @@
 *.map
 *.list
 *.log
+*.dep
+*.srec
 
-# Misc / editor backups
+# Misc / Editor Backups
 *.swp
 *.bak
 *.tmp
 *.user
 *.launch
+*.save
+*.backup
+
+# OS Noise
+__MACOSX/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python Cache Files
+__pycache__/
+*.pyc
