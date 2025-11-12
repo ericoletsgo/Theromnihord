@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { chordMap } from "@/data/chordMap";
 import { audioManager } from "@/utils/audioManager";
+import { TouchBar } from "./TouchBar";
 
 // Check if WebSerial API is available (safe check that won't crash)
 const isWebSerialSupported = () => {
@@ -215,6 +216,15 @@ export const STM32Panel = () => {
     });
   }, []);
 
+  // Convert STM32 chord name to chord key for TouchBar compatibility
+  // TouchBar expects a key like "q", "w", etc., but we have chord name like "Eb MAJ"
+  // We need to find the chord in chordMap and return its key
+  const getChordKeyFromName = (chordName: string | null): string | null => {
+    if (!chordName) return null;
+    const chord = chordMap.find((c) => c.chordName === chordName);
+    return chord ? chord.key : null;
+  };
+
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6">
       {/* Info Panel */}
@@ -286,6 +296,13 @@ export const STM32Panel = () => {
         </div>
       </div>
 
+      {/* Scale Keys (TouchBar) - Only show when chord is active */}
+      {currentChord && (
+        <div className="mt-8">
+          <TouchBar activeChord={getChordKeyFromName(currentChord)} />
+        </div>
+      )}
+
       {/* Status Info */}
       <div className="bg-secondary/20 p-4 rounded-lg text-sm text-muted-foreground">
         <p className="font-semibold mb-2">Status:</p>
@@ -294,6 +311,9 @@ export const STM32Panel = () => {
           <li>Baud Rate: 115200</li>
           <li>Chord playback: {isConnected ? "Active" : "Waiting for connection"}</li>
           <li>Press chord buttons on STM32 board to play sounds</li>
+          {currentChord && (
+            <li>Scale keys: Press 1-9, 0, -, = to play scale notes</li>
+          )}
         </ul>
       </div>
     </div>
